@@ -7,8 +7,9 @@ import com.bouyahya.data.requests.RegisterRequest
 import com.bouyahya.data.responses.AuthResponse
 import com.bouyahya.data.responses.RegisterResponse
 import com.bouyahya.events.AuthValidationEvent
-import com.bouyahya.routes.authenticate
 import com.bouyahya.service.UserService
+import com.bouyahya.util.GmailApi
+import com.bouyahya.util.GmailOperations
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -95,7 +96,8 @@ fun Route.register(
             }
 
             is AuthValidationEvent.Success -> {
-                userService.createUser(request)
+                //userService.createUser(request)
+                GmailOperations().sendEmail()
                 call.respond(
                     HttpStatusCode.OK, RegisterResponse(
                         success = true,
