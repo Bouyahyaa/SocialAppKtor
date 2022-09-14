@@ -2,13 +2,18 @@ package com.bouyahya.routes
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.bouyahya.data.models.Token
 import com.bouyahya.data.requests.LoginRequest
 import com.bouyahya.data.requests.RegisterRequest
+import com.bouyahya.data.requests.TokenRequest
 import com.bouyahya.data.responses.AuthResponse
 import com.bouyahya.data.responses.RegisterResponse
+import com.bouyahya.data.responses.TokenResponse
 import com.bouyahya.events.AuthValidationEvent
+import com.bouyahya.events.TokenValidationEvent
+import com.bouyahya.service.TokenService
 import com.bouyahya.service.UserService
-import com.bouyahya.util.GmailApi
+import com.bouyahya.util.Constants
 import com.bouyahya.util.GmailOperations
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -20,7 +25,8 @@ import io.ktor.server.routing.*
 import java.util.*
 
 fun Route.register(
-    userService: UserService
+    userService: UserService,
+    tokenService: TokenService
 ) {
     post("/api/users/register") {
         val request = call.receiveOrNull<RegisterRequest>() ?: kotlin.run {
@@ -97,15 +103,32 @@ fun Route.register(
 
             is AuthValidationEvent.Success -> {
                 userService.createUser(request)
+                val lowerLimit = 12345L
+                val upperLimit = 23456L
+                val r = Random()
+                val number = lowerLimit + (r.nextDouble() * (upperLimit - lowerLimit)).toLong()
                 val subjectEmail = " Account Verification "
                 val bodyTextEmail = "Hello " +
                         request.username +
                         ",\n\n" +
-                        "Veuillez vérifier votre compte en cliquant sur le lien : \n" +
-                        "http://192.168.68.110:8080/confirmEmail/" +
-                        request.email +
-                        "\n\nMerci ! \n"
+                        "Your confirmation code to access Social T Network App is : \n" +
+                        "$number" +
+                        "\n\nThank you ! \n"
                 GmailOperations().sendEmail(request.email, subjectEmail, bodyTextEmail)
+                val userId = userService.getUserByEmail(request.email)?.id!!
+                val token = tokenService.getToken(userId, Constants.EMAIL_CODE)
+                if (token != null) {
+                    tokenService.deleteToken(token)
+                }
+                tokenService.createToken(
+                    Token(
+                        userId = userId,
+                        type = Constants.EMAIL_CODE,
+                        code = number.toString()
+                    )
+                )
+
+
                 call.respond(
                     HttpStatusCode.OK, RegisterResponse(
                         success = true,
@@ -124,7 +147,6 @@ fun Route.register(
             }
         }
     }
-
 }
 
 fun Route.login(
@@ -215,29 +237,80 @@ fun Route.authenticate() {
     }
 }
 
-
-fun Route.confirmEmail(
-    userService: UserService,
+fun Route.confirmation(
+    tokenService: TokenService,
+    userService: UserService
 ) {
-    get("/confirmEmail/{email}") {
-        val email = call.parameters["email"]
-        if (userService.updateUser(email!!)) {
-            call.respond(HttpStatusCode.OK, "Your account has been successfully verified")
-        } else {
-            call.respond(
-                HttpStatusCode.NotFound,
-                "found no todo with this email $email"
-            )
+    post("/api/users/confirmation/{email}") {
+        val request = call.receiveOrNull<TokenRequest>() ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest)
+            return@post
         }
-    }
-}
 
-fun Route.getSecretInfo() {
-    authenticate {
-        get("/api/users/secret") {
-            val principal = call.principal<JWTPrincipal>()
-            val userId = principal?.getClaim("userId", String::class)
-            call.respond(HttpStatusCode.OK, "Your userId is $userId")
+        val email = call.parameters["email"]
+
+        when (tokenService.validateToken(request, email!!)) {
+
+            is TokenValidationEvent.AlreadyVerified -> {
+                call.respond(
+                    HttpStatusCode.Conflict, TokenResponse(
+                        success = false,
+                        message = "User Already have confirmed email . You can log in now ."
+                    )
+                )
+                return@post
+            }
+
+            is TokenValidationEvent.ErrorFieldEmpty -> {
+                call.respond(
+                    HttpStatusCode.Conflict, TokenResponse(
+                        success = false,
+                        message = "Token is required to confirm your email"
+                    )
+                )
+                return@post
+            }
+
+            is TokenValidationEvent.InvalidToken -> {
+                call.respond(
+                    HttpStatusCode.Conflict, TokenResponse(
+                        success = false,
+                        message = "Token should have only digits"
+                    )
+                )
+                return@post
+            }
+
+            is TokenValidationEvent.TokenTooShort -> {
+                call.respond(
+                    HttpStatusCode.Conflict, TokenResponse(
+                        success = false,
+                        message = "Token must be exactly 5 digits"
+                    )
+                )
+                return@post
+            }
+
+            is TokenValidationEvent.TokensNotMatch -> {
+                call.respond(
+                    HttpStatusCode.Conflict, TokenResponse(
+                        success = false,
+                        message = "That's not the right token"
+                    )
+                )
+                return@post
+            }
+
+            is TokenValidationEvent.Success -> {
+                userService.updateUser(email)
+                call.respond(
+                    HttpStatusCode.OK,
+                    TokenResponse(
+                        success = true,
+                        message = "You have successfully verified your email"
+                    )
+                )
+            }
         }
     }
 }

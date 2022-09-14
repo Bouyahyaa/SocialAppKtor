@@ -7,5 +7,6 @@ data class Token(
     @BsonId
     val id: String = ObjectId().toString(),
     val userId: String,
-    val Code: Long
+    val code: String,
+    val type: String
 )

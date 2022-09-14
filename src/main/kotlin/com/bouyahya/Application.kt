@@ -1,8 +1,10 @@
 package com.bouyahya
 
+import com.bouyahya.data.repository.token.TokenRepositoryImpl
 import com.bouyahya.data.repository.user.UserRepositoryImpl
 import io.ktor.server.application.*
 import com.bouyahya.plugins.*
+import com.bouyahya.service.TokenService
 import com.bouyahya.service.UserService
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
@@ -22,8 +24,11 @@ fun Application.module() {
     val userDataSource = UserRepositoryImpl(db)
     val userService = UserService(userDataSource)
 
+    val tokenDataSource = TokenRepositoryImpl(db)
+    val tokenService = TokenService(tokenDataSource, userDataSource)
+
     configureSerialization()
     configureMonitoring()
     configureSecurity()
-    configureRouting(userService)
+    configureRouting(userService, tokenService)
 }
