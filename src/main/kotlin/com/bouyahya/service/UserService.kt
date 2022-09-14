@@ -57,6 +57,10 @@ class UserService(
             return AuthValidationEvent.IsUserExist
         }
 
+        if (!isEmailVerified(request.email)) {
+            return AuthValidationEvent.EmailNotVerified
+        }
+
         if (!isValidPassword(request.email, request.password)) {
             return AuthValidationEvent.InvalidPassword
         }
@@ -81,8 +85,27 @@ class UserService(
         return userRepository.getUserByEmail(email)
     }
 
+    suspend fun updateUser(email: String): Boolean {
+        val user = getUserByEmail(email)
+        val updatedUser = User(
+            id = user?.id!!,
+            email = user.email,
+            username = user.username,
+            password = user.password,
+            profileImageUrl = user.profileImageUrl,
+            bio = user.bio,
+            isVerified = true,
+        )
+        return userRepository.updateUser(updatedUser)
+    }
+
     private suspend fun isValidPassword(email: String, enteredPassword: String): Boolean {
         val user = userRepository.getUserByEmail(email)
         return BCrypt.checkpw(enteredPassword, user?.password)
+    }
+
+    private suspend fun isEmailVerified(email: String): Boolean {
+        val user = userRepository.getUserByEmail(email)
+        return user?.isVerified!!
     }
 }

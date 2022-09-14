@@ -11,6 +11,7 @@ data class User(
     val password: String,
     val profileImageUrl: String,
     val bio: String,
+    val isVerified: Boolean = false,
     val followerCount: Int = 0,
     val followingCount: Int = 0,
     val postCount: Int = 0

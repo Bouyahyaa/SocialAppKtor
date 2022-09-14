@@ -17,10 +17,8 @@ class GmailOperations {
 
     @Throws(MessagingException::class, IOException::class)
     fun sendMessage(service: Gmail, userId: String?, email: MimeMessage?) {
-        var message: Message = createMessageWithEmail(email!!)!!
-        message = service.users().messages().send(userId, message).execute()
-        System.out.println("Message id: " + message.getId())
-        System.out.println(message.toPrettyString())
+        val message: Message = createMessageWithEmail(email!!)!!
+        service.users().messages().send(userId, message).executeAsInputStream()
     }
 
     @Throws(MessagingException::class, IOException::class)
@@ -46,19 +44,15 @@ class GmailOperations {
     }
 
     @Throws(IOException::class, GeneralSecurityException::class, MessagingException::class)
-    fun sendEmail() {
+    fun sendEmail(toEmail: String, subjectEmail: String, bodyTextEmail: String) {
         val service: Gmail? = GmailApi().main()
         val Mimemessage =
             createEmail(
-                "bilel.bouyahya@outlook.com",
+                toEmail,
                 "tunicare.dawini@gmail.com",
-                "This my demo test subject",
-                "This is my body text"
+                subjectEmail,
+                bodyTextEmail
             )
-        try {
-            sendMessage(service!!, "me", Mimemessage)
-        } catch (e: NoSuchMethodError) {
-            e.printStackTrace()
-        }
+        sendMessage(service!!, "me", Mimemessage)
     }
 }

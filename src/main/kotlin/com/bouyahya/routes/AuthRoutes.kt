@@ -96,8 +96,16 @@ fun Route.register(
             }
 
             is AuthValidationEvent.Success -> {
-                //userService.createUser(request)
-                GmailOperations().sendEmail()
+                userService.createUser(request)
+                val subjectEmail = " Account Verification "
+                val bodyTextEmail = "Hello " +
+                        request.username +
+                        ",\n\n" +
+                        "Veuillez vérifier votre compte en cliquant sur le lien : \n" +
+                        "http://192.168.68.110:8080/confirmEmail/" +
+                        request.email +
+                        "\n\nMerci ! \n"
+                GmailOperations().sendEmail(request.email, subjectEmail, bodyTextEmail)
                 call.respond(
                     HttpStatusCode.OK, RegisterResponse(
                         success = true,
@@ -162,6 +170,16 @@ fun Route.login(
                 return@post
             }
 
+            is AuthValidationEvent.EmailNotVerified -> {
+                call.respond(
+                    HttpStatusCode.Conflict, AuthResponse(
+                        success = false,
+                        message = "Email Not Verified . Please check your email"
+                    )
+                )
+                return@post
+            }
+
             is AuthValidationEvent.Success -> {
                 val expiresIn = 1000L * 60L * 60L * 24L * 365L
                 val user = userService.getUserByEmail(request.email)
@@ -193,6 +211,23 @@ fun Route.authenticate() {
     authenticate {
         get("/api/users/authenticate") {
             call.respond(HttpStatusCode.OK)
+        }
+    }
+}
+
+
+fun Route.confirmEmail(
+    userService: UserService,
+) {
+    get("/confirmEmail/{email}") {
+        val email = call.parameters["email"]
+        if (userService.updateUser(email!!)) {
+            call.respond(HttpStatusCode.OK, "Your account has been successfully verified")
+        } else {
+            call.respond(
+                HttpStatusCode.NotFound,
+                "found no todo with this email $email"
+            )
         }
     }
 }

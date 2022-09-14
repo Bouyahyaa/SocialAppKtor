@@ -8,5 +8,6 @@ sealed class AuthValidationEvent {
     object PasswordTooShort : AuthValidationEvent()
     object UsernameTooShort : AuthValidationEvent()
     object PasswordsNotMatch : AuthValidationEvent()
+    object EmailNotVerified : AuthValidationEvent()
     object Success : AuthValidationEvent()
 }

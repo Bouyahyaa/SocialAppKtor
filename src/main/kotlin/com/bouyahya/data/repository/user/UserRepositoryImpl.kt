@@ -16,4 +16,8 @@ class UserRepositoryImpl(db: CoroutineDatabase) : UserRepository {
     override suspend fun getUserByEmail(email: String): User? {
         return users.findOne(User::email eq email)
     }
+
+    override suspend fun updateUser(user: User): Boolean {
+        return users.updateOne(User::id eq user.id, user).wasAcknowledged()
+    }
 }
