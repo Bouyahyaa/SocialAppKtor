@@ -33,5 +33,10 @@ fun Application.configureRouting(
             tokenService = tokenService,
             userService = userService
         )
+
+        resendCode(
+            userService = userService,
+            tokenService = tokenService
+        )
     }
 }

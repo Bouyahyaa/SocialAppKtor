@@ -1,9 +1,9 @@
-package com.bouyahya.data.responses
+package com.bouyahya.util
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TokenResponse(
+data class Response(
     val success: Boolean,
     val message: String,
 )

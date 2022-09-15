@@ -3,7 +3,9 @@ package com.bouyahya.data.responses
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RegisterResponse(
+data class LoginResponse(
+    val userId: String? = null,
+    val token: String? = null,
     val success: Boolean,
-    val message: String,
+    val message: String
 )

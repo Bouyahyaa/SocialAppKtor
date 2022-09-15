@@ -6,15 +6,14 @@ import com.bouyahya.data.models.Token
 import com.bouyahya.data.requests.LoginRequest
 import com.bouyahya.data.requests.RegisterRequest
 import com.bouyahya.data.requests.TokenRequest
-import com.bouyahya.data.responses.AuthResponse
-import com.bouyahya.data.responses.RegisterResponse
-import com.bouyahya.data.responses.TokenResponse
+import com.bouyahya.data.responses.LoginResponse
 import com.bouyahya.events.AuthValidationEvent
 import com.bouyahya.events.TokenValidationEvent
 import com.bouyahya.service.TokenService
 import com.bouyahya.service.UserService
 import com.bouyahya.util.Constants
 import com.bouyahya.util.GmailOperations
+import com.bouyahya.util.Response
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -30,7 +29,7 @@ fun Route.register(
     post("/api/users/register") {
         val request = call.receiveOrNull<RegisterRequest>() ?: kotlin.run {
             call.respond(
-                HttpStatusCode.BadRequest, RegisterResponse(
+                HttpStatusCode.BadRequest, Response(
                     success = false,
                     message = "Bad Request"
                 )
@@ -42,7 +41,7 @@ fun Route.register(
 
             is AuthValidationEvent.ErrorFieldEmpty -> {
                 call.respond(
-                    HttpStatusCode.Conflict, RegisterResponse(
+                    HttpStatusCode.Conflict, Response(
                         success = false,
                         message = "Required Field is missing"
                     )
@@ -52,7 +51,7 @@ fun Route.register(
 
             is AuthValidationEvent.InvalidEmail -> {
                 call.respond(
-                    HttpStatusCode.Conflict, RegisterResponse(
+                    HttpStatusCode.Conflict, Response(
                         success = false,
                         message = "Invalid Email"
                     )
@@ -62,7 +61,7 @@ fun Route.register(
 
             is AuthValidationEvent.IsUserExist -> {
                 call.respond(
-                    HttpStatusCode.Conflict, RegisterResponse(
+                    HttpStatusCode.Conflict, Response(
                         success = false,
                         message = "User already register with this email"
                     )
@@ -72,7 +71,7 @@ fun Route.register(
 
             is AuthValidationEvent.UsernameTooShort -> {
                 call.respond(
-                    HttpStatusCode.Conflict, RegisterResponse(
+                    HttpStatusCode.Conflict, Response(
                         success = false,
                         message = "Username is too short.."
                     )
@@ -82,7 +81,7 @@ fun Route.register(
 
             is AuthValidationEvent.PasswordTooShort -> {
                 call.respond(
-                    HttpStatusCode.Conflict, RegisterResponse(
+                    HttpStatusCode.Conflict, Response(
                         success = false,
                         message = "Password is too short.."
                     )
@@ -92,7 +91,7 @@ fun Route.register(
 
             is AuthValidationEvent.PasswordsNotMatch -> {
                 call.respond(
-                    HttpStatusCode.Conflict, RegisterResponse(
+                    HttpStatusCode.Conflict, Response(
                         success = false,
                         message = "Passwords doesn't match"
                     )
@@ -129,7 +128,7 @@ fun Route.register(
 
 
                 call.respond(
-                    HttpStatusCode.OK, RegisterResponse(
+                    HttpStatusCode.OK, Response(
                         success = true,
                         message = "You have successfully registered"
                     )
@@ -138,7 +137,7 @@ fun Route.register(
 
             else -> {
                 call.respond(
-                    HttpStatusCode.BadRequest, RegisterResponse(
+                    HttpStatusCode.BadRequest, Response(
                         success = true,
                         message = "Something Wrong"
                     )
@@ -163,7 +162,7 @@ fun Route.login(
         when (userService.validateLogin(request)) {
             is AuthValidationEvent.ErrorFieldEmpty -> {
                 call.respond(
-                    HttpStatusCode.Conflict, AuthResponse(
+                    HttpStatusCode.Conflict, LoginResponse(
                         success = false,
                         message = "Required Field is missing"
                     )
@@ -173,7 +172,7 @@ fun Route.login(
 
             is AuthValidationEvent.IsUserExist -> {
                 call.respond(
-                    HttpStatusCode.Conflict, AuthResponse(
+                    HttpStatusCode.Conflict, LoginResponse(
                         success = false,
                         message = "No user is registered with this email"
                     )
@@ -183,7 +182,7 @@ fun Route.login(
 
             is AuthValidationEvent.InvalidPassword -> {
                 call.respond(
-                    HttpStatusCode.Conflict, AuthResponse(
+                    HttpStatusCode.Conflict, LoginResponse(
                         success = false,
                         message = "Incorrect Password"
                     )
@@ -193,7 +192,7 @@ fun Route.login(
 
             is AuthValidationEvent.EmailNotVerified -> {
                 call.respond(
-                    HttpStatusCode.Conflict, AuthResponse(
+                    HttpStatusCode.Conflict, LoginResponse(
                         success = false,
                         message = "Email Not Verified . Please check your email"
                     )
@@ -212,7 +211,7 @@ fun Route.login(
                     .sign(Algorithm.HMAC256(jwtSecret))
                 call.respond(
                     HttpStatusCode.OK,
-                    AuthResponse(
+                    LoginResponse(
                         userId = user?.id!!,
                         token = token,
                         success = true,
@@ -244,7 +243,7 @@ fun Route.confirmation(
 
             is TokenValidationEvent.AlreadyVerified -> {
                 call.respond(
-                    HttpStatusCode.Conflict, TokenResponse(
+                    HttpStatusCode.Conflict, Response(
                         success = false,
                         message = "User Already have confirmed email . You can log in now ."
                     )
@@ -254,7 +253,7 @@ fun Route.confirmation(
 
             is TokenValidationEvent.ErrorFieldEmpty -> {
                 call.respond(
-                    HttpStatusCode.Conflict, TokenResponse(
+                    HttpStatusCode.Conflict, Response(
                         success = false,
                         message = "Token is required to confirm your email"
                     )
@@ -264,7 +263,7 @@ fun Route.confirmation(
 
             is TokenValidationEvent.InvalidToken -> {
                 call.respond(
-                    HttpStatusCode.Conflict, TokenResponse(
+                    HttpStatusCode.Conflict, Response(
                         success = false,
                         message = "Token should have only digits"
                     )
@@ -274,7 +273,7 @@ fun Route.confirmation(
 
             is TokenValidationEvent.TokenTooShort -> {
                 call.respond(
-                    HttpStatusCode.Conflict, TokenResponse(
+                    HttpStatusCode.Conflict, Response(
                         success = false,
                         message = "Token must be exactly 5 digits"
                     )
@@ -284,7 +283,7 @@ fun Route.confirmation(
 
             is TokenValidationEvent.TokensNotMatch -> {
                 call.respond(
-                    HttpStatusCode.Conflict, TokenResponse(
+                    HttpStatusCode.Conflict, Response(
                         success = false,
                         message = "That's not the right token"
                     )
@@ -296,13 +295,65 @@ fun Route.confirmation(
                 userService.confirmEmailUser(email)
                 call.respond(
                     HttpStatusCode.OK,
-                    TokenResponse(
+                    Response(
                         success = true,
                         message = "You have successfully verified your email"
                     )
                 )
             }
         }
+    }
+}
+
+fun Route.resendCode(
+    userService: UserService,
+    tokenService: TokenService
+) {
+    post("/api/users/resendCode/{email}") {
+        val email = call.parameters["email"]
+        val user = userService.getUserByEmail(email!!)
+
+        if (user == null) {
+            call.respond(
+                HttpStatusCode.Conflict,
+                Response(
+                    success = false,
+                    message = "No user found with this email"
+                )
+            )
+        }
+
+        val lowerLimit = 12345L
+        val upperLimit = 23456L
+        val r = Random()
+        val number = lowerLimit + (r.nextDouble() * (upperLimit - lowerLimit)).toLong()
+        val subjectEmail = " Resend Code Verification "
+        val bodyTextEmail = "Hello " +
+                user?.username +
+                ",\n\n" +
+                "Your confirmation code to access Social T Network App is : \n" +
+                "$number" +
+                "\n\nThank you ! \n"
+        GmailOperations().sendEmail(user?.email!!, subjectEmail, bodyTextEmail)
+        val token = tokenService.getToken(user.id, Constants.EMAIL_CODE)
+        if (token != null) {
+            tokenService.deleteToken(token)
+        }
+        tokenService.createToken(
+            Token(
+                userId = user.id,
+                type = Constants.EMAIL_CODE,
+                code = number.toString()
+            )
+        )
+
+        call.respond(
+            HttpStatusCode.OK,
+            Response(
+                success = true,
+                message = "New Token is generated . Please check your email"
+            )
+        )
     }
 }
 
