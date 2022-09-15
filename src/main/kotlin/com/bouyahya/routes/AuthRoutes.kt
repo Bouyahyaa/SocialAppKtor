@@ -18,7 +18,6 @@ import com.bouyahya.util.GmailOperations
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -229,14 +228,6 @@ fun Route.login(
     }
 }
 
-fun Route.authenticate() {
-    authenticate {
-        get("/api/users/authenticate") {
-            call.respond(HttpStatusCode.OK)
-        }
-    }
-}
-
 fun Route.confirmation(
     tokenService: TokenService,
     userService: UserService
@@ -302,7 +293,7 @@ fun Route.confirmation(
             }
 
             is TokenValidationEvent.Success -> {
-                userService.updateUser(email)
+                userService.confirmEmailUser(email)
                 call.respond(
                     HttpStatusCode.OK,
                     TokenResponse(
@@ -311,6 +302,14 @@ fun Route.confirmation(
                     )
                 )
             }
+        }
+    }
+}
+
+fun Route.authenticate() {
+    authenticate {
+        get("/api/users/authenticate") {
+            call.respond(HttpStatusCode.OK)
         }
     }
 }

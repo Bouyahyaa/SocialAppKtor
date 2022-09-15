@@ -85,7 +85,7 @@ class UserService(
         return userRepository.getUserByEmail(email)
     }
 
-    suspend fun updateUser(email: String): Boolean {
+    suspend fun confirmEmailUser(email: String): Boolean {
         val user = getUserByEmail(email)
         val updatedUser = User(
             id = user?.id!!,

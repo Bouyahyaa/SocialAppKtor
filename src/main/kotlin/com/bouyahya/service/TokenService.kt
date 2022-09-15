@@ -43,7 +43,7 @@ class TokenService(
             return TokenValidationEvent.AlreadyVerified
         }
 
-        val token = tokenRepository.getToken(user?.id!!, Constants.EMAIL_CODE)
+        val token = tokenRepository.getToken(user.id, Constants.EMAIL_CODE)
         if (token?.code != request.code) {
             return TokenValidationEvent.TokensNotMatch
         }
