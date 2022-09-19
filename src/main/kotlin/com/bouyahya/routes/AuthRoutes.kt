@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.bouyahya.data.models.Token
 import com.bouyahya.data.requests.LoginRequest
 import com.bouyahya.data.requests.RegisterRequest
+import com.bouyahya.data.requests.ResetPasswordRequest
 import com.bouyahya.data.requests.TokenRequest
 import com.bouyahya.data.responses.LoginResponse
 import com.bouyahya.events.AuthValidationEvent
@@ -89,6 +90,16 @@ fun Route.register(
                 return@post
             }
 
+            is AuthValidationEvent.InvalidPassword -> {
+                call.respond(
+                    HttpStatusCode.Conflict, Response(
+                        success = false,
+                        message = "The password needs to contain at least one letter and digit"
+                    )
+                )
+                return@post
+            }
+
             is AuthValidationEvent.PasswordsNotMatch -> {
                 call.respond(
                     HttpStatusCode.Conflict, Response(
@@ -101,10 +112,7 @@ fun Route.register(
 
             is AuthValidationEvent.Success -> {
                 userService.createUser(request)
-                val lowerLimit = 12345L
-                val upperLimit = 23456L
-                val r = Random()
-                val number = lowerLimit + (r.nextDouble() * (upperLimit - lowerLimit)).toLong()
+                val number = tokenService.generateToken()
                 val subjectEmail = " Account Verification "
                 val bodyTextEmail = "Hello " +
                         request.username +
@@ -239,7 +247,7 @@ fun Route.confirmation(
 
         val email = call.parameters["email"]
 
-        when (tokenService.validateToken(request, email!!)) {
+        when (tokenService.validateConfirmationToken(request, email!!)) {
 
             is TokenValidationEvent.AlreadyVerified -> {
                 call.respond(
@@ -323,10 +331,7 @@ fun Route.resendCode(
             )
         }
 
-        val lowerLimit = 12345L
-        val upperLimit = 23456L
-        val r = Random()
-        val number = lowerLimit + (r.nextDouble() * (upperLimit - lowerLimit)).toLong()
+        val number = tokenService.generateToken()
         val subjectEmail = " Resend Code Verification "
         val bodyTextEmail = "Hello " +
                 user?.username +
@@ -354,6 +359,196 @@ fun Route.resendCode(
                 message = "New Token is generated . Please check your email"
             )
         )
+    }
+}
+
+fun Route.forgetPassword(
+    userService: UserService,
+    tokenService: TokenService
+) {
+    post("/api/users/forgetPassword/{email}") {
+        val email = call.parameters["email"]
+        val user = userService.getUserByEmail(email!!)
+
+        if (user == null) {
+            call.respond(
+                HttpStatusCode.Conflict,
+                Response(
+                    success = false,
+                    message = "No user found with this email"
+                )
+            )
+        }
+
+        val number = tokenService.generateToken()
+        val subjectEmail = " Reset Password Code "
+        val bodyTextEmail = "Hello " +
+                user?.username +
+                ",\n\n" +
+                "Your code to reset password and jump into Social T Network App is : \n" +
+                "$number" +
+                "\n\nThank you ! \n"
+        GmailOperations().sendEmail(user?.email!!, subjectEmail, bodyTextEmail)
+
+        val token = tokenService.getToken(user.id, Constants.PASSWORD_CODE)
+        if (token != null) {
+            tokenService.deleteToken(token)
+        }
+        tokenService.createToken(
+            Token(
+                userId = user.id,
+                type = Constants.PASSWORD_CODE,
+                code = number.toString()
+            )
+        )
+
+        call.respond(
+            HttpStatusCode.OK,
+            Response(
+                success = true,
+                message = "Token is generated to reset password . Please check your email"
+            )
+        )
+    }
+}
+
+fun Route.verifyTokenPassword(
+    tokenService: TokenService
+) {
+    post("/api/users/verifyTokenPassword/{email}") {
+        val request = call.receiveOrNull<TokenRequest>() ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest)
+            return@post
+        }
+
+        val email = call.parameters["email"]
+
+        when (tokenService.validateResetPasswordToken(request, email!!)) {
+
+            is TokenValidationEvent.ErrorFieldEmpty -> {
+                call.respond(
+                    HttpStatusCode.Conflict, Response(
+                        success = false,
+                        message = "Token is required to reset your password"
+                    )
+                )
+                return@post
+            }
+
+            is TokenValidationEvent.InvalidToken -> {
+                call.respond(
+                    HttpStatusCode.Conflict, Response(
+                        success = false,
+                        message = "Token should have only digits"
+                    )
+                )
+                return@post
+            }
+
+            is TokenValidationEvent.TokenTooShort -> {
+                call.respond(
+                    HttpStatusCode.Conflict, Response(
+                        success = false,
+                        message = "Token must be exactly 5 digits"
+                    )
+                )
+                return@post
+            }
+
+            is TokenValidationEvent.TokensNotMatch -> {
+                call.respond(
+                    HttpStatusCode.Conflict, Response(
+                        success = false,
+                        message = "That's not the right token"
+                    )
+                )
+                return@post
+            }
+
+            is TokenValidationEvent.Success -> {
+                call.respond(
+                    HttpStatusCode.OK,
+                    Response(
+                        success = true,
+                        message = "You have the permission now to reset your password"
+                    )
+                )
+            }
+
+            else -> {
+                call.respond(HttpStatusCode.BadRequest, "Something Wrong")
+            }
+        }
+    }
+}
+
+fun Route.resetPassword(
+    userService: UserService
+) {
+    post("/api/users/resetPassword/{email}") {
+        val request = call.receiveOrNull<ResetPasswordRequest>() ?: kotlin.run {
+            call.respond(HttpStatusCode.BadRequest)
+            return@post
+        }
+
+        val email = call.parameters["email"]
+
+        when (userService.validateResetPassword(request)) {
+            is AuthValidationEvent.ErrorFieldEmpty -> {
+                call.respond(
+                    HttpStatusCode.Conflict, Response(
+                        success = false,
+                        message = "Required Field is missing"
+                    )
+                )
+                return@post
+            }
+
+            is AuthValidationEvent.PasswordTooShort -> {
+                call.respond(
+                    HttpStatusCode.Conflict, Response(
+                        success = false,
+                        message = "Password is too short.."
+                    )
+                )
+                return@post
+            }
+
+            is AuthValidationEvent.InvalidPassword -> {
+                call.respond(
+                    HttpStatusCode.Conflict, Response(
+                        success = false,
+                        message = "The password needs to contain at least one letter and digit"
+                    )
+                )
+                return@post
+            }
+
+            is AuthValidationEvent.PasswordsNotMatch -> {
+                call.respond(
+                    HttpStatusCode.Conflict, Response(
+                        success = false,
+                        message = "Passwords doesn't match"
+                    )
+                )
+                return@post
+            }
+
+            is AuthValidationEvent.Success -> {
+                userService.resetPassword(request, email!!)
+                call.respond(
+                    HttpStatusCode.OK,
+                    Response(
+                        success = true,
+                        message = "You have successfully reset your password"
+                    )
+                )
+            }
+
+            else -> {
+                call.respond(HttpStatusCode.BadRequest, "Something Wrong")
+            }
+        }
     }
 }
 

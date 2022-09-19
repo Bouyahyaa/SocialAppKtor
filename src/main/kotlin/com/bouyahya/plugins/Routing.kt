@@ -38,5 +38,18 @@ fun Application.configureRouting(
             userService = userService,
             tokenService = tokenService
         )
+
+        forgetPassword(
+            userService = userService,
+            tokenService = tokenService
+        )
+
+        verifyTokenPassword(
+            tokenService = tokenService
+        )
+
+        resetPassword(
+            userService = userService
+        )
     }
 }

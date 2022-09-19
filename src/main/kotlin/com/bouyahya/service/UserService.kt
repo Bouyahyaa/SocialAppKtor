@@ -4,6 +4,7 @@ import com.bouyahya.data.models.User
 import com.bouyahya.data.repository.user.UserRepository
 import com.bouyahya.data.requests.LoginRequest
 import com.bouyahya.data.requests.RegisterRequest
+import com.bouyahya.data.requests.ResetPasswordRequest
 import com.bouyahya.events.AuthValidationEvent
 import com.bouyahya.util.Constants
 import org.mindrot.jbcrypt.BCrypt
@@ -39,6 +40,11 @@ class UserService(
             return AuthValidationEvent.PasswordTooShort
         }
 
+        val containsLettersAndDigits = request.password.any { it.isDigit() } && request.password.any { it.isLetter() }
+        if (!containsLettersAndDigits) {
+            return AuthValidationEvent.InvalidPassword
+        }
+
         val doesPasswordsMatch = request.password == request.confirmPassword
         if (!doesPasswordsMatch) {
             return AuthValidationEvent.PasswordsNotMatch
@@ -66,6 +72,47 @@ class UserService(
         }
 
         return AuthValidationEvent.Success
+    }
+
+
+    fun validateResetPassword(request: ResetPasswordRequest): AuthValidationEvent {
+
+        val areFieldsBlank = request.password.isBlank() || request.confirmPassword.isBlank()
+        if (areFieldsBlank) {
+            return AuthValidationEvent.ErrorFieldEmpty
+        }
+
+        val isPwTooShort = request.password.length < 8
+        if (isPwTooShort) {
+            return AuthValidationEvent.PasswordTooShort
+        }
+
+        val containsLettersAndDigits = request.password.any { it.isDigit() } && request.password.any { it.isLetter() }
+        if (!containsLettersAndDigits) {
+            return AuthValidationEvent.InvalidPassword
+        }
+
+        val doesPasswordsMatch = request.password == request.confirmPassword
+        if (!doesPasswordsMatch) {
+            return AuthValidationEvent.PasswordsNotMatch
+        }
+
+        return AuthValidationEvent.Success
+    }
+
+    suspend fun resetPassword(request: ResetPasswordRequest, email: String): Boolean {
+        val hashedPassword = BCrypt.hashpw(request.password, BCrypt.gensalt())
+        val user = getUserByEmail(email)
+        val updatedUser = User(
+            id = user?.id!!,
+            email = user.email,
+            username = user.username,
+            password = hashedPassword,
+            profileImageUrl = user.profileImageUrl,
+            bio = user.bio,
+            isVerified = user.isVerified,
+        )
+        return userRepository.updateUser(updatedUser)
     }
 
     suspend fun createUser(request: RegisterRequest) {
