@@ -83,7 +83,7 @@ class GmailApi {
                 "596361886709-tnlu4imkgt0j449cda0jpldhucg8cfgf.apps.googleusercontent.com" //Replace this
             params["client_secret"] = "Tz5BSvpSx_wkQZXx763jGmcE" //Replace this
             params["refresh_token"] =
-                "1//04VGrVGhYiCRHCgYIARAAGAQSNwF-L9IrGjxYh0BGJkUUvoJm808n1EVy4HGErJQYAKGratZ93k5y3mnlnU9Mph0_DIQUEXqRdMwgit " //Replace this
+                "1//04VGrVGhYiCRHCgYIARAAGAQSNwF-L9IrGjxYh0BGJkUUvoJm808n1EVy4HGErJQYAKGratZ93k5y3mnlnU9Mph0_DIQUEXqRdMw" //Replace this
             val postData = StringBuilder()
             for ((key, value) in params) {
                 if (postData.length != 0) {
