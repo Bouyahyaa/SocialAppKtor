@@ -64,7 +64,7 @@ class GmailApi {
                     clientSecrets.details.clientSecret.toString()
                 )
                 .build().setAccessToken(getAccessToken()).setRefreshToken(
-                    "1//04OgH4zdBfC1yCgYIARAAGAQSNwF-L9IrOArd7lI3tjotmWQJwtTXkZQddK4VwEIejvZM7okLBX3HL83DO8hl_RyodLa9GK5t-hY"
+                    "1//04mfGR8U_Gz-6CgYIARAAGAQSNwF-L9IrY4XRSMLPPSUYcm58FYBPOBFTHM_CL1L2E1GFVz56-3VD-734icfVmSPZtT2dFdWHN3I"
                 ) //Replace this
 
         // Create Gmail service
@@ -83,7 +83,7 @@ class GmailApi {
                 "596361886709-tnlu4imkgt0j449cda0jpldhucg8cfgf.apps.googleusercontent.com" //Replace this
             params["client_secret"] = "Tz5BSvpSx_wkQZXx763jGmcE" //Replace this
             params["refresh_token"] =
-                "1//04VGrVGhYiCRHCgYIARAAGAQSNwF-L9IrGjxYh0BGJkUUvoJm808n1EVy4HGErJQYAKGratZ93k5y3mnlnU9Mph0_DIQUEXqRdMw" //Replace this
+                "1//04mfGR8U_Gz-6CgYIARAAGAQSNwF-L9IrY4XRSMLPPSUYcm58FYBPOBFTHM_CL1L2E1GFVz56-3VD-734icfVmSPZtT2dFdWHN3I" //Replace this
             val postData = StringBuilder()
             for ((key, value) in params) {
                 if (postData.length != 0) {
