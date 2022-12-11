@@ -1,11 +1,11 @@
-package com.bouyahya.service
+package com.bouyahya.feature_auth.service
 
-import com.bouyahya.data.models.User
-import com.bouyahya.data.repository.user.UserRepository
-import com.bouyahya.data.requests.LoginRequest
-import com.bouyahya.data.requests.RegisterRequest
-import com.bouyahya.data.requests.ResetPasswordRequest
-import com.bouyahya.events.AuthValidationEvent
+import com.bouyahya.feature_auth.data.models.User
+import com.bouyahya.feature_auth.data.repository.user.UserRepository
+import com.bouyahya.feature_auth.data.requests.LoginRequest
+import com.bouyahya.feature_auth.data.requests.RegisterRequest
+import com.bouyahya.feature_auth.data.requests.ResetPasswordRequest
+import com.bouyahya.feature_auth.events.AuthValidationEvent
 import com.bouyahya.util.Constants
 import org.mindrot.jbcrypt.BCrypt
 

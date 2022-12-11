@@ -1,4 +1,4 @@
-package com.bouyahya.data.models
+package com.bouyahya.feature_auth.data.models
 
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.types.ObjectId

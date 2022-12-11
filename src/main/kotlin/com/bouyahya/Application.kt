@@ -1,11 +1,11 @@
 package com.bouyahya
 
-import com.bouyahya.data.repository.token.TokenRepositoryImpl
-import com.bouyahya.data.repository.user.UserRepositoryImpl
+import com.bouyahya.feature_auth.data.repository.token.TokenRepositoryImpl
+import com.bouyahya.feature_auth.data.repository.user.UserRepositoryImpl
 import io.ktor.server.application.*
 import com.bouyahya.plugins.*
-import com.bouyahya.service.TokenService
-import com.bouyahya.service.UserService
+import com.bouyahya.feature_auth.service.TokenService
+import com.bouyahya.feature_auth.service.UserService
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 

@@ -1,10 +1,10 @@
-package com.bouyahya.service
+package com.bouyahya.feature_auth.service
 
-import com.bouyahya.data.models.Token
-import com.bouyahya.data.repository.token.TokenRepository
-import com.bouyahya.data.repository.user.UserRepository
-import com.bouyahya.data.requests.TokenRequest
-import com.bouyahya.events.TokenValidationEvent
+import com.bouyahya.feature_auth.data.models.Token
+import com.bouyahya.feature_auth.data.repository.token.TokenRepository
+import com.bouyahya.feature_auth.data.repository.user.UserRepository
+import com.bouyahya.feature_auth.data.requests.TokenRequest
+import com.bouyahya.feature_auth.events.TokenValidationEvent
 import com.bouyahya.util.Constants
 import java.util.*
 

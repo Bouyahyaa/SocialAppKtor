@@ -1,4 +1,4 @@
-package com.bouyahya.data.responses
+package com.bouyahya.feature_auth.data.responses
 
 import kotlinx.serialization.Serializable
 

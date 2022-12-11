@@ -1,6 +1,6 @@
-package com.bouyahya.data.repository.token
+package com.bouyahya.feature_auth.data.repository.token
 
-import com.bouyahya.data.models.Token
+import com.bouyahya.feature_auth.data.models.Token
 
 interface TokenRepository {
     suspend fun createToken(token: Token)

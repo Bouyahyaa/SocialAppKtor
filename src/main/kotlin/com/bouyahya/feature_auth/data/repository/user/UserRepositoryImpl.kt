@@ -1,6 +1,6 @@
-package com.bouyahya.data.repository.user
+package com.bouyahya.feature_auth.data.repository.user
 
-import com.bouyahya.data.models.User
+import com.bouyahya.feature_auth.data.models.User
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
 

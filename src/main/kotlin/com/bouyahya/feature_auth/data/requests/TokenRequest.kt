@@ -1,4 +1,4 @@
-package com.bouyahya.data.requests
+package com.bouyahya.feature_auth.data.requests
 
 import kotlinx.serialization.Serializable
 

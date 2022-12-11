@@ -1,4 +1,4 @@
-package com.bouyahya.events
+package com.bouyahya.feature_auth.events
 
 sealed class AuthValidationEvent {
     object ErrorFieldEmpty : AuthValidationEvent()
