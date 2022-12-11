@@ -6,4 +6,5 @@ object Constants {
     const val DEFAULT_PROFILE_PICTURE_PATH = "${BASE_URL}profile_pictures/avatar.svg"
     const val EMAIL_CODE = "email_code"
     const val PASSWORD_CODE = "password_code"
+    const val DEFAULT_PAGE_SIZE = 15
 }
