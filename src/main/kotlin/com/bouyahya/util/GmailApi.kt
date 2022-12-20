@@ -5,7 +5,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.JsonFactory
-import com.google.api.client.json.jackson2.JacksonFactory
+import com.google.api.client.json.gson.GsonFactory
 import com.google.api.client.util.StringUtils
 import com.google.api.services.gmail.Gmail
 import com.google.api.services.gmail.model.Message
@@ -20,7 +20,7 @@ import java.security.GeneralSecurityException
 
 class GmailApi {
     private val APPLICATION_NAME = "Gmail API Java Quickstart"
-    private val JSON_FACTORY: JsonFactory = JacksonFactory.getDefaultInstance()
+    private val JSON_FACTORY: JsonFactory = GsonFactory.getDefaultInstance();
     private val user = "me"
     var service: Gmail? = null
     private val filePath = File(System.getProperty("user.dir") + "/credentials.json")
@@ -64,7 +64,7 @@ class GmailApi {
                     clientSecrets.details.clientSecret.toString()
                 )
                 .build().setAccessToken(getAccessToken()).setRefreshToken(
-                    "1//04mfGR8U_Gz-6CgYIARAAGAQSNwF-L9IrY4XRSMLPPSUYcm58FYBPOBFTHM_CL1L2E1GFVz56-3VD-734icfVmSPZtT2dFdWHN3I"
+                    "1//04DaZAY1NBxKDCgYIARAAGAQSNwF-L9IrR7ZZhVdSo-2BsxgRT4rgWrxbALTDPQW2McOk-UUedSGsfamSMNx-51Qf6QlsRHY0goY"
                 ) //Replace this
 
         // Create Gmail service
@@ -83,7 +83,7 @@ class GmailApi {
                 "596361886709-tnlu4imkgt0j449cda0jpldhucg8cfgf.apps.googleusercontent.com" //Replace this
             params["client_secret"] = "Tz5BSvpSx_wkQZXx763jGmcE" //Replace this
             params["refresh_token"] =
-                "1//04mfGR8U_Gz-6CgYIARAAGAQSNwF-L9IrY4XRSMLPPSUYcm58FYBPOBFTHM_CL1L2E1GFVz56-3VD-734icfVmSPZtT2dFdWHN3I" //Replace this
+                "1//04DaZAY1NBxKDCgYIARAAGAQSNwF-L9IrR7ZZhVdSo-2BsxgRT4rgWrxbALTDPQW2McOk-UUedSGsfamSMNx-51Qf6QlsRHY0goY" //Replace this
             val postData = StringBuilder()
             for ((key, value) in params) {
                 if (postData.length != 0) {

@@ -1,7 +1,6 @@
 package com.bouyahya.plugins
 
 import com.bouyahya.feature_auth.routes.*
-import com.bouyahya.routes.*
 import com.bouyahya.feature_auth.service.TokenService
 import com.bouyahya.feature_auth.service.UserService
 import io.ktor.server.routing.*
