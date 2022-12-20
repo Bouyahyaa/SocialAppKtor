@@ -49,7 +49,7 @@ class GmailOperations {
         val Mimemessage =
             createEmail(
                 toEmail,
-                "tunicare.dawini@gmail.com",
+                "bilelhamza.bouyahya@gmail.com",
                 subjectEmail,
                 bodyTextEmail
             )
