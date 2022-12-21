@@ -5,6 +5,7 @@ import com.google.api.services.gmail.model.Message
 import org.apache.commons.codec.binary.Base64
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.lang.Exception
 import java.security.GeneralSecurityException
 import java.util.*
 import javax.mail.MessagingException
@@ -18,7 +19,11 @@ class GmailOperations {
     @Throws(MessagingException::class, IOException::class)
     fun sendMessage(service: Gmail, userId: String?, email: MimeMessage?) {
         val message: Message = createMessageWithEmail(email!!)!!
-        service.users().messages().send(userId, message).executeAsInputStream()
+        try {
+            service.users().messages().send(userId, message).execute()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     @Throws(MessagingException::class, IOException::class)
