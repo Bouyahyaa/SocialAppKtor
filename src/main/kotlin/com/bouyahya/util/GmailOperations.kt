@@ -20,7 +20,7 @@ class GmailOperations {
     fun sendMessage(service: Gmail, userId: String?, email: MimeMessage?) {
         val message: Message = createMessageWithEmail(email!!)!!
         try {
-            service.users().messages().send(userId, message).execute()
+            service.users().messages().send(userId, message).executeAsInputStream()
         } catch (e: Exception) {
             e.printStackTrace()
         }

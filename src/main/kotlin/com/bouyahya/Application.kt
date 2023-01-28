@@ -15,7 +15,7 @@ fun main(args: Array<String>): Unit =
 @Suppress("unused") // application.conf references the main function. This annotation prevents the IDE from marking it as unused.
 fun Application.module() {
 
-    val mongoPassword = System.getenv("MONGO_PW")
+    val mongoPassword = "Bilelbilel200"
     val databaseName = "SocialAppDB"
     val db = KMongo.createClient(
         connectionString = "mongodb+srv://bilelJs:$mongoPassword@cluster0.0dt5b.mongodb.net/$databaseName?retryWrites=true&w=majority"
