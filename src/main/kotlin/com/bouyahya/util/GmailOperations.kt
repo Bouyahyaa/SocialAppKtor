@@ -54,7 +54,7 @@ class GmailOperations {
         val Mimemessage =
             createEmail(
                 toEmail,
-                "bilelhamza.bouyahya@gmail.com",
+                "Your email", // Replace This
                 subjectEmail,
                 bodyTextEmail
             )

@@ -64,7 +64,7 @@ class GmailApi {
                     clientSecrets.details.clientSecret.toString()
                 )
                 .build().setAccessToken(getAccessToken()).setRefreshToken(
-                    "1//04dao64xuqu3XCgYIARAAGAQSNwF-L9IrSo6OF-QPbZz6uZE9mBTGwi-xQRUcHcowpJM_Xq2Z51jb1ALz-8oKMP_WLZ7f_V-VLyw"
+                    "Refresh Token"
                 ) //Replace this
 
         // Create Gmail service
@@ -78,12 +78,12 @@ class GmailApi {
         try {
             val params: MutableMap<String, Any> =
                 LinkedHashMap()
-            params["grant_type"] = "refresh_token"
+            params["grant_type"] = "refresh_token" // Don't Replace this
             params["client_id"] =
-                "596361886709-tnlu4imkgt0j449cda0jpldhucg8cfgf.apps.googleusercontent.com" //Replace this
-            params["client_secret"] = "Tz5BSvpSx_wkQZXx763jGmcE" //Replace this
+                "Client Id" //Replace this
+            params["client_secret"] = "Client Secret" //Replace this
             params["refresh_token"] =
-                "1//04dao64xuqu3XCgYIARAAGAQSNwF-L9IrSo6OF-QPbZz6uZE9mBTGwi-xQRUcHcowpJM_Xq2Z51jb1ALz-8oKMP_WLZ7f_V-VLyw" //Replace this
+                "Refresh Token" //Replace this
             val postData = StringBuilder()
             for ((key, value) in params) {
                 if (postData.length != 0) {
